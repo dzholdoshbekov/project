@@ -1,0 +1,5 @@
+django
+djangoretframework
+djoser
+djangorestframework_simplejwt
+social-auth-app-django
