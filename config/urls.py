@@ -25,6 +25,7 @@ router = routers.DefaultRouter()
 router.register(r'course', CourseViewSet)
 router.register(r'enrollments', EnrollmentViewSet, basename='enrollments')
 router.register(r'my-account', MyAccountViewSet, basename='my-account')
+router.register(r'users', UserViewSet, basename='user')
 print(router.urls)
 
 urlpatterns = [
@@ -32,7 +33,4 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('api/v1/auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
-    path('users/', UserList.as_view()),
-    path('users/<int:pk>/', UserDetail.as_view()),
-
 ]

@@ -1,6 +1,6 @@
 
 from django.contrib.auth.models import User
-from .serializers import UserSerializer, CourseSerializer, ContentSerializer, EnrollmentSerializer
+from .serializers import UserSerializer, CourseSerializer, EnrollmentSerializer
 from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,22 +10,31 @@ from .serializers import *
 
 
 
-class UserList(generics.ListCreateAPIView):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+#
+#
+# class UserList(generics.ListCreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#
+# class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
+
+
     def get_permissions(self):
 
-        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update':
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or\
+            self.action == 'destroy':
+
             permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
         else:
             permission_classes = [permissions.AllowAny]
@@ -34,27 +43,48 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=True, permission_classes=[IsOwner], methods=['post'])
-    def add_chapter(self, request, pk=None):
+    @action(detail=True, methods=['get', 'post'])
+    def add_block(self, request, pk=None):
         course = self.get_object()
-        serializer = ChapterSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(course=course)
+
+        if request.method == 'GET':
+            blocks = LessonBlocks.objects.filter(course=course)
+            serializer = BlocksSerializer(blocks, many=True)
             return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=400)
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated, IsOwner])
-    def add_content(self, request, pk=None):
-        chapter = Chapter.objects.get(pk=request.data.get('chapter_id'))
-        serializer = ContentSerializer(data=request.data)
+        if request.method == 'POST':
+            serializer = BlocksSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(course=course)
+                return Response(serializer.data, status =201)
+            else:
+                return Response(serializer.errors, status=400)
+
+    # @action(detail=True, permission_classes=[IsOwner], methods=['post'])
+    # def add_chapter(self, request, pk=None):
+    #     course = self.get_object()
+    #     serializer = ChapterSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save(course=course)
+    #         return Response(serializer.data)
+    #     else:
+    #         return Response(serializer.errors, status=400)
+    #
+    # @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated, IsOwner])
+    # def add_content(self, request, pk=None):
+    #     chapter = Chapter.objects.get(pk=request.data.get('chapter_id'))
+    #     serializer = ContentSerializer(data=request.data)
+    #
+    #
+    #     if serializer.is_valid():
+    #         serializer.save(chapter=chapter)
+    #         return Response(serializer.data)
+    #     else:
+    #         return Response(serializer.errors, status=400)
 
 
-        if serializer.is_valid():
-            serializer.save(chapter=chapter)
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=400)
+
+
 
 
 class EnrollmentViewSet(viewsets.ModelViewSet):

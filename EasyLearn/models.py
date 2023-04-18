@@ -12,6 +12,7 @@ class Course(models.Model):
     price = models.IntegerField(null=True)
     discount = models.IntegerField(null=True)
     cat = models.ForeignKey('Category', related_name="Категории", on_delete=PROTECT, null=True)
+
     def __str__(self):
         return self.title
 
@@ -29,16 +30,21 @@ class Enrollment(models.Model):
     def __str__(self):
         return f'{self.user.username} enrolled in {self.course.title}'
 
-class Chapter(models.Model):
-    title = models.CharField(max_length=255)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='chapters', blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.course_id:
-            self.course_id = self.course.id
-        super().save(*args, **kwargs)
-
-class Content(models.Model):
+# class Chapter(models.Model):
+#     title = models.CharField(max_length=255)
+#     course = models.ForeignKey(Course, on_delete=models.CASCADE, blank=True, null=True)
+#
+#     def save(self, *args, **kwargs):
+#         if not self.course_id:
+#             self.course_id = self.course.id
+#         super().save(*args, **kwargs)
+#
+# class Content(models.Model):
+#     title = models.CharField(max_length=255)
+#     body = models.TextField()
+#     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
+#
+class LessonBlocks(models.Model):
     title = models.CharField(max_length=255)
     body = models.TextField()
-    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='contents')
+    course = models.ForeignKey('Course', related_name="БлокиКурса", on_delete=PROTECT, null=True)

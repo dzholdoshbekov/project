@@ -1,6 +1,9 @@
+from django.contrib.auth import get_user_model
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from .models import *
 from django.contrib.auth.models import User
+
 
 class CourseSerializer(serializers.ModelSerializer):
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -16,16 +19,22 @@ class UserSerializer(serializers.ModelSerializer):
 
         
 
-class ChapterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Chapter
-        fields = ['title', 'course']
 
-
-class ContentSerializer(serializers.ModelSerializer):
+class BlocksSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Content
-        fields = ['title', 'body', 'chapter_id']
+        model = LessonBlocks
+        fields = ['title', 'body', 'course']
+
+# class ChapterSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Chapter
+#         fields = ['title', 'course']
+#
+#
+# class ContentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Content
+#         fields = ['title', 'body', 'chapter_id']
 
 class EnrollmentSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
