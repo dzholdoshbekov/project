@@ -15,13 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
+
+
+from rest_framework import routers
+
 from EasyLearn.views import *
+
+router = routers.DefaultRouter()
+router.register(r'course', CourseViewSet)
+router.register(r'enrollments', EnrollmentViewSet, basename='enrollments')
+router.register(r'my-account', MyAccountViewSet, basename='my-account')
+print(router.urls)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('EasyLearn.urls')),
-    path('auth/', include('djoser.urls')),
-    re_path('^auth/ ', include('djoser.urls.authtoken')),
+    path('api/v1/', include(router.urls)),
+    path('api/v1/auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('users/', UserList.as_view()),
     path('users/<int:pk>/', UserDetail.as_view()),
+
 ]

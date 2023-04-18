@@ -1,22 +1,35 @@
 from rest_framework import serializers
-from EasyLearn.models import Post
-from .models import Category
+from .models import *
 from django.contrib.auth.models import User
+
+class CourseSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    class Meta:
+        model = Course
+        fields = ('title', 'description', 'cat', 'author', 'price', 'discount')
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password']
 
         
 
-class PostSerializer(serializers.ModelSerializer):
+class ChapterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chapter
+        fields = ['title', 'course']
 
+
+class ContentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Post
-        fields = '__all__'
-    
-class CategorySerializer(serializers.ModelSerializer):
+        model = Content
+        fields = ['title', 'body', 'chapter_id']
+
+class EnrollmentSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
-        model = Category
-        fields = ('id', 'name', 'description')
+        model = Enrollment
+        fields = ('user', 'course', 'date_joined')
+
