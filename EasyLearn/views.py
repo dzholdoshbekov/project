@@ -5,7 +5,7 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .permissions import IsOwnerOrReadOnly, IsOwner
+from .permissions import *
 from .serializers import *
 
 
@@ -28,13 +28,8 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
-
-
     def get_permissions(self):
-
-        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or\
-            self.action == 'destroy':
-
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
             permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
         else:
             permission_classes = [permissions.AllowAny]
@@ -43,22 +38,47 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=True, methods=['get', 'post'])
-    def add_block(self, request, pk=None):
-        course = self.get_object()
 
-        if request.method == 'GET':
-            blocks = LessonBlocks.objects.filter(course=course)
-            serializer = BlocksSerializer(blocks, many=True)
-            return Response(serializer.data)
 
-        if request.method == 'POST':
-            serializer = BlocksSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(course=course)
-                return Response(serializer.data, status =201)
-            else:
-                return Response(serializer.errors, status=400)
+class CourseBlockViewSet(viewsets.ModelViewSet):
+    queryset = LessonBlocks.objects.all()
+    serializer_class = BlocksSerializer
+
+    def get_permissions(self):
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [permissions.IsAuthenticated, IsCourseAuthorOrReadOnly]
+        else:
+            permission_classes = [permissions.AllowAny]
+        return [permission() for permission in permission_classes]
+
+
+    # @action(detail=True, methods=['get', 'post', 'put'], permission_classes=[IsCourseAuthorOrReadOnly])
+    # def add_block(self, request, pk=None):
+    #     course = self.get_object()
+    #
+    #     if request.method == 'GET':
+    #         blocks = LessonBlocks.objects.filter(course=course)
+    #         serializer = BlocksSerializer(blocks, many=True)
+    #         return Response(serializer.data)
+    #
+    #     if request.method == 'POST':
+    #         serializer = BlocksSerializer(data=request.data)
+    #         if serializer.is_valid():
+    #             serializer.save(course=course)
+    #             return Response(serializer.data, status =201)
+    #         else:
+    #             return Response(serializer.errors, status=400)
+    #
+    #
+    #     elif request.method == 'PUT':
+    #         blocks = LessonBlocks.objects.filter(course=course)
+    #         serializer = BlocksSerializer(blocks, data=request.data, many=True)
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response(serializer.data)
+    #         else:
+    #             return Response(serializer.errors, status=400)
+
 
     # @action(detail=True, permission_classes=[IsOwner], methods=['post'])
     # def add_chapter(self, request, pk=None):

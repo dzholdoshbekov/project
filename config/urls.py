@@ -26,6 +26,7 @@ router.register(r'course', CourseViewSet)
 router.register(r'enrollments', EnrollmentViewSet, basename='enrollments')
 router.register(r'my-account', MyAccountViewSet, basename='my-account')
 router.register(r'users', UserViewSet, basename='user')
+router.register(r'course/(?P<course_pk>[^/.]+)/block', CourseBlockViewSet, basename='course-block')
 print(router.urls)
 
 urlpatterns = [

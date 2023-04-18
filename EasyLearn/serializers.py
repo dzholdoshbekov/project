@@ -7,11 +7,15 @@ from django.contrib.auth.models import User
 
 class CourseSerializer(serializers.ModelSerializer):
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    final_price = serializers.SerializerMethodField()
     class Meta:
         model = Course
-        fields = ('title', 'description', 'cat', 'author', 'price', 'discount')
-
-
+        fields = ('title', 'description', 'cat', 'author', 'price', 'discount', 'final_price')
+    def get_final_price(self, obj):
+        discount = obj.discount
+        price = obj.price
+        final_price = price - (price * (discount / 100))
+        return final_price
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -23,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 class BlocksSerializer(serializers.ModelSerializer):
     class Meta:
         model = LessonBlocks
-        fields = ['title', 'body', 'course']
+        fields = ['title', 'body']
 
 # class ChapterSerializer(serializers.ModelSerializer):
 #     class Meta:

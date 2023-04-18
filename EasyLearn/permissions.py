@@ -1,5 +1,7 @@
 from rest_framework import permissions, request
 
+from EasyLearn.models import Course
+
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
 
@@ -11,11 +13,12 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
         return obj.author == request.user
 
-class IsOwner(permissions.BasePermission):
 
-    # def has_permission(self, request, view):
-    #     print('has_permission: request.user=', request.user)
-    #     return True
+class IsCourseAuthorOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user and request.user.is_authenticated
+
     def has_object_permission(self, request, view, obj):
-        print('has_object_permission: obj.author=', obj.author, 'request.user=', request.user)
-        return obj.author == request.user
+        return obj.course.author == request.user

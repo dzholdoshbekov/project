@@ -47,4 +47,4 @@ class Enrollment(models.Model):
 class LessonBlocks(models.Model):
     title = models.CharField(max_length=255)
     body = models.TextField()
-    course = models.ForeignKey('Course', related_name="БлокиКурса", on_delete=PROTECT, null=True)
+    course = models.ForeignKey('Course', related_name="БлокиКурса", on_delete=PROTECT, null=True, blank=True)
