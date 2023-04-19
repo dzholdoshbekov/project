@@ -46,7 +46,7 @@ class CourseBlockViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
-            permission_classes = [permissions.IsAuthenticated, IsCourseAuthorOrReadOnly]
+            permission_classes = [permissions.IsAuthenticated, IsLessonBlockAuthor]
         else:
             permission_classes = [permissions.AllowAny]
         return [permission() for permission in permission_classes]

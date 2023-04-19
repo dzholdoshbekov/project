@@ -1,6 +1,7 @@
 from rest_framework import permissions, request
+from rest_framework.generics import get_object_or_404
 
-from EasyLearn.models import Course
+from EasyLearn.models import Course, User
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -14,11 +15,15 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return obj.author == request.user
 
 
-class IsCourseAuthorOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
+class IsLessonBlockAuthor(permissions.BasePermission):
+    """
+    Custom permission to only allow lesson block authors to add, update, or delete the block.
+    """
+    def has_object_permission(self, request, view, obj):
+        # Check if the request method is safe (GET, HEAD, OPTIONS)
         if request.method in permissions.SAFE_METHODS:
             return True
-        return request.user and request.user.is_authenticated
 
-    def has_object_permission(self, request, view, obj):
+        # Otherwise, check if the user is the author of the course that the block belongs to
+        course = Course.objects.all()
         return obj.course.author == request.user
