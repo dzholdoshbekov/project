@@ -1,3 +1,5 @@
+from django.db.migrations import serializer
+from requests import Response
 from rest_framework import permissions, request
 from rest_framework.generics import get_object_or_404
 
@@ -19,11 +21,20 @@ class IsLessonBlockAuthor(permissions.BasePermission):
     """
     Custom permission to only allow lesson block authors to add, update, or delete the block.
     """
-    def has_object_permission(self, request, view, obj):
-        # Check if the request method is safe (GET, HEAD, OPTIONS)
-        if request.method in permissions.SAFE_METHODS:
-            return True
+    def has_permission(self, request, view):
+        # Check if the request method is safe (GET, HEAD, OPTIONS
+        # else:
+        #     return Response(serializer.errors, status=400)
+
+
 
         # Otherwise, check if the user is the author of the course that the block belongs to
-        course = Course.objects.all()
-        return obj.course.author == request.user
+        course_id = view.kwargs.get('course_pk')
+        course = Course.objects.get(pk=course_id)
+        return course.author == request.user
+
+# class IsCourseAuthorForCreate(permissions.BasePermission):
+#     def has_permission(self, request, view):
+#         course_id = view.kwargs.get('course_pk')
+#         course = Course.objects.get(pk=course_id)
+#         return course.author == request.user

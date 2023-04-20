@@ -10,7 +10,7 @@ class CourseSerializer(serializers.ModelSerializer):
     final_price = serializers.SerializerMethodField()
     class Meta:
         model = Course
-        fields = ('title', 'description', 'cat', 'author', 'price', 'discount', 'final_price')
+        fields = ('id', 'title', 'description', 'cat', 'author', 'price', 'discount', 'final_price')
     def get_final_price(self, obj):
         discount = obj.discount
         price = obj.price
@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 class BlocksSerializer(serializers.ModelSerializer):
     class Meta:
         model = LessonBlocks
-        fields = ['title', 'body']
+        fields = ['id', 'title', 'body']
 
 # class ChapterSerializer(serializers.ModelSerializer):
 #     class Meta:

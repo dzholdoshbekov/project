@@ -45,7 +45,9 @@ class CourseBlockViewSet(viewsets.ModelViewSet):
     serializer_class = BlocksSerializer
 
     def get_permissions(self):
-        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+        if self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [permissions.IsAuthenticated, IsLessonBlockAuthor]
+        elif self.action == 'create':
             permission_classes = [permissions.IsAuthenticated, IsLessonBlockAuthor]
         else:
             permission_classes = [permissions.AllowAny]
